@@ -33,7 +33,9 @@ gulp.task('bulkCsvToJsonConversion', function(){
 
 ## Config File :page_facing_up:
 
+
 **`/path/to/*.conf`**
+
 
 ```
 [
@@ -70,3 +72,4 @@ John Doe, Puerto Princesa city, Metro Manila, Palawan, Oxford,1993, Harvard,2003
 ```
 
 ## How it Works :wrench:
+
