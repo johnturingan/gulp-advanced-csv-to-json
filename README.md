@@ -77,3 +77,24 @@ John Doe, Puerto Princesa city, Metro Manila, Palawan, Oxford,1993, Harvard,2003
 
 ## How it Works :wrench:
 
+Advanced Csv to Json will fetch the config file and process all items. It will read the CSV file that you declared and
+check if there's a desired contract that you want to use. If there's none, it will just convert the csv to a flat JSON
+object. If there is, it will use the structure and match all values of the JSON to the CSV.
+
+Notice that you can declare the value to be an Array or Double (default is String).
+
+```
+{
+    key : [dataType]:[csvValue]
+}
+
+```
+
+If you look at the json and csv closer
+
+**`json`**
+```"tags" : "Array:tags"```
+**`csv`**
+a|b|c
+
+you may notice that the convention for Array:tags is pipe delimited values.
