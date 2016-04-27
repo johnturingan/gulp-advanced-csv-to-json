@@ -110,20 +110,25 @@ you may notice that the convention for Array:tags is pipe delimited values.
 ## Options :radio_button:
 
 
-**`CONFIG FILE`**
+**`CONFIG FILE - `**
 
 There are 3 options you may use for the config file.
 
 - filePath - Required :red_circle:
-- outputPath - Optional (default: output/csvFilename.json)
-- contract - Optional (default: flat json conversion)
+- outputPath - Optional ```(default: output/csvFilename.json)```
+- contract - Optional ```(default: flat json conversion)```
 
 
-**`aCsvToJson`**
+**`aCsvToJson - `**
 
 Currently there's only one option you can use for this module.
 
 - tabSize - Your preferred tab size for the JSON.
+
+
+
+
+
 
 ----
 **[MIT](LICENSE) LICENSE** <br>

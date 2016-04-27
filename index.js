@@ -158,7 +158,8 @@ var C2JProcessor = {
 
             var x = csv.parse(bufferContents.toString(), {
 
-                columns : true
+                columns : true,
+                trim : true
 
             }, function (e, o) {
 
