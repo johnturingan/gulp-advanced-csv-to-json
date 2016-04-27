@@ -31,7 +31,7 @@ gulp.task('bulkCsvToJsonConversion', function(){
              }))
 ```
 
-## Config File :page_facing_up
+## Config File :page_facing_up:
 
 **`/templates/t0001.conf`**
 
