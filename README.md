@@ -93,8 +93,24 @@ Notice that you can declare the value to be an Array or Double (default is Strin
 If you look at the json and csv closer
 
 **`json`**
-```"tags" : "Array:tags"```
+```
+"tags" : "Array:tags"
+```
 **`csv`**
+
+```
 a|b|c
+```
 
 you may notice that the convention for Array:tags is pipe delimited values.
+
+
+## Options :radio_button:
+
+**`Config File`**
+
+There are 3 options you may use for the config file.
+
+- filePath - Required :red_circle:
+- outputPath - Optional (default: output/csvFilename.json)
+- contract - Optional (default: flat json conversion)
