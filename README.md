@@ -65,10 +65,14 @@ gulp.task('bulkCsvToJsonConversion', function(){
 
 ## CSV File :page_facing_up:
 
+**`/path/to/*.csv`**
+
 ```
+
 name, address/permanent/city, address/permanent/state, address/current, school_0, year_0, school_1, year_1,tags
 Juan Dela Cruz, Quezon city, Metro Manila, Makati city,DPS,1997,PSU,2001,a|b|c
 John Doe, Puerto Princesa city, Metro Manila, Palawan, Oxford,1993, Harvard,2003,t1|t2|t3
+
 ```
 
 ## How it Works :wrench:
