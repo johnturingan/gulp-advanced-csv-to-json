@@ -1,0 +1,42 @@
+{
+  "name": "gulp-csv-to-json",
+  "version": "0.1.0",
+  "description": "Convert CSV to Json based on contract",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "gulp",
+    "gulpplugin",
+    "csv",
+    "json",
+    "contract",
+    "object"
+  ],
+  "dependencies": {
+    "csv": "^0.4.6",
+    "dotize": "^0.1.26",
+    "event-stream": "^3.3.2",
+    "filesize": "~2.0.0",
+    "graceful-fs": "~2.0.0",
+    "gulp-rename": "~1.1.0",
+    "gulp-util": "~2.2.0",
+    "lodash": "^4.11.1",
+    "map-stream": "0.0.4",
+    "q": "^1.4.1",
+    "temp-write": "~0.1.0",
+    "xml2js": "~0.4.1"
+  },
+  "author": "johnturingan",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "~1.17.1"
+  },
+  "homepage": "https://github.com/johnturingan/gulp-csv-to-json/",
+  "bugs": "https://github.com/johnturingan/gulp-csv-to-json/issues/",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:johnturingan/gulp-csv-to-json.git"
+  }
+}
