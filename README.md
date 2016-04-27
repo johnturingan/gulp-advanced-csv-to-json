@@ -33,7 +33,7 @@ gulp.task('bulkCsvToJsonConversion', function(){
 
 ## USAGE :white_check_mark:
 
-** CONFIG FILE** :page_facing_up:
+####CONFIG FILE :page_facing_up:
 
 
 **`/path/to/*.conf`**
@@ -65,7 +65,7 @@ gulp.task('bulkCsvToJsonConversion', function(){
 ]
 ```
 
-## CSV File :page_facing_up:
+#### CSV FILE :page_facing_up:
 
 **`/path/to/*.csv`**
 
