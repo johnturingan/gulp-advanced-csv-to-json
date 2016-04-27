@@ -4,7 +4,7 @@
 
 var gulp = require('gulp');
 var g = require('gulp-load-plugins')();
-var csvToJson = require('../index.js');
+var aCsvToJson = require('../index.js');
 
 var p = require('./package.json').options;
 
@@ -16,7 +16,7 @@ gulp.task('test', function () {
         c = true;
 
     return gulp.src(p.configs.src)
-        .pipe(csvToJson({
+        .pipe(aCsvToJson({
             tabSize : 4
         }))
         .on('error',g.util.log)
