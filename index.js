@@ -15,8 +15,17 @@ var jsonfile = require('jsonfile');
 
 var C2JProcessor = {
 
-    init : function (fileContents, options) {
+    initExtensions : function () {
 
+        String.prototype.splitPlus = function(sep) {
+            var a = this.split(sep)
+            if (a[0] == '') return [];
+            return a;
+        };
+    },
+
+    init : function (fileContents, options) {
+        this.initExtensions();
         var self = this;
         var c = JSON.parse(fileContents);
 
@@ -107,12 +116,48 @@ var C2JProcessor = {
                 switch (t[0]) {
                     case "Array" :
 
-                        _.set(c, key, csv[t[1]].split('|'));
+                        var m = t[1].match(/{([^}]+)}/);
+
+                        if (_.isArray(m)) {
+                            var k = null;
+                            if (m[1] === 'int') {
+
+                                k = t[1].replace('{int}', '');
+
+                                var num = csv[k].splitPlus('|').map(function(item) {
+                                    return parseInt(item, 10);
+                                });
+
+                                _.set(c, key, num);
+
+                            } else if (m[1] === 'float') {
+                                k = t[1].replace('{float}', '');
+
+                                var f = csv[k].splitPlus('|').map(function(item) {
+                                    return parseFloat(item);
+                                });
+
+                                _.set(c, key, f);
+
+                            }
+
+                        } else {
+
+                            _.set(c, key, csv[t[1]].splitPlus('|'));
+                        }
 
                         break;
 
-                    case "Double" :
-                        var n = parseFloat(csv[t[1]]);
+                    case "Float" :
+                        var ft = parseFloat(csv[t[1]]);
+
+                        _.set(c, key, isNaN(ft) ? 0 : n);
+
+                        break;
+
+                    case "Int" :
+
+                        var n = parseInt(csv[t[1]]);
 
                         _.set(c, key, isNaN(n) ? 0 : n);
 

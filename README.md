@@ -50,7 +50,7 @@ gulp.task('bulkCsvToJsonConversion', function(){
         "contract" : {
             "name" : "name",
             "profile" : {
-                "age" : "Double:profile/age"
+                "age" : "Float:profile/age"
             },
             "address" : {
                 "permanent" : {
@@ -83,7 +83,7 @@ Advanced Csv to Json will fetch the config file and process all items. It will r
 check if there's a desired contract that you want to use. If there's none, it will just convert the csv to a flat JSON
 object. If there is, it will use the structure and match all values of the JSON to the CSV.
 
-Notice that you can declare the value to be an Array or Double (default is String).
+Notice that you can declare the value to be an Array or Float (default is String).
 
 ```
 {
@@ -104,8 +104,19 @@ If you look at the json and csv closer
 a|b|c
 ```
 
-you may notice that the convention for Array:tags is pipe delimited values.
+you may notice that the convention for Array:tags is pipe delimited values. You may also set the datatype of the values
+of the array. Lets say you want the array of int or array of float (default is string), you can do that by declaring your
+desired type like this:
 
+**`int`**
+```
+"tags" : "Array:{int}tags"
+```
+
+**`float`**
+```
+"tags" : "Array:{float}tags"
+```
 
 ## Options :radio_button:
 
