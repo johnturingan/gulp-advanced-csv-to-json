@@ -65,6 +65,40 @@ gulp.task('bulkCsvToJsonConversion', function(){
 ]
 ```
 
+Sometimes you may want to use same contract to all the csv file that you want to convert. **YOU CAN!** You just need to modify your config file a little bit. Here's how your config file would look like.
+
+```
+{
+    "globalContract" : {
+        "name" : "name",
+        "profile" : {
+            "age" : "Float:profile/age"
+        },
+        "address" : {
+            "permanent" : {
+                "city" : "address/permanent/city",
+                "state" : "address/permanent/state"
+            },
+            "current" : "address/current"
+        },
+        "tags" : "Array:tags"
+    },
+    "list" : [
+        {
+            "filePath" : "csv/002.csv",
+            "useGlobalContract" : false
+        },
+        {
+            "filePath" : "csv/001.csv",
+            "outputPath" : "output/001.json",
+            "useGlobalContract" : true
+        }
+    ]
+}
+```
+
+Notice that there is **useGlobalContract** property that you set to boolean. If you set to `false`, and you don't have a **contract** property, it will convert the csv to flat json. But, if you set it to `false` and you declare **contract**, it will use it instead of the **globalContract**. If you set it to `true`, then ofcourse it will use the global contract you set above.
+
 #### CSV FILE :page_facing_up:
 
 **`/path/to/*.csv`**
@@ -125,10 +159,13 @@ desired type like this:
 
 There are 3 options you may use for the config file.
 
-- filePath - Required :red_circle:
-- outputPath - Optional ```(default: output/csvFilename.json)```
-- contract - Optional ```(default: flat json conversion)```
-
+- **`BASIC CONFIG`**
+    - filePath [`String`] - Required :red_circle:
+    - outputPath [`String`] - Optional ```(default: output/{your-csv-filename}.json)```
+    - contract [`Object`] - Optional ```(default: flat json conversion)```
+- **`CONFIG USING GLOBAL CONTRACT`**
+    - globalContract [`Object`] - Required :red_circle:
+    - useGlobalContract [`Boolean`] -  Required :red_circle:
 
 **`aCsvToJson - `**
 
@@ -138,8 +175,18 @@ Currently there's only one option you can use for this module.
 
 
 
+## Running the DEMO :neckbeard:
+You may want to test the demo. Here's how to run it.
+```
+cd /to/demo/folder
+npm install
+gulp convert
+```
 
 
+**`NOTE:`**
+
+If you find any bugs or you have some ideas in mind that would make this better. Please don't hesitate to send comment on github.
 
 ----
 **[MIT](LICENSE) LICENSE** <br>

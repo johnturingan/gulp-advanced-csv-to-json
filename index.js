@@ -18,24 +18,60 @@ var C2JProcessor = {
     initExtensions : function () {
 
         String.prototype.splitPlus = function(sep) {
-            var a = this.split(sep)
+            var a = this.split(sep);
             if (a[0] == '') return [];
             return a;
         };
     },
 
     init : function (fileContents, options) {
-        this.initExtensions();
+
         var self = this;
+
+        this.initExtensions();
+
         var c = JSON.parse(fileContents);
 
         if (!_.isArray(c)) {
-            throw new gutil.PluginError('gulp-csv-to-json', 'Invalid configuration. Must be array of object');
+
+            if (!_.has(c, 'globalContract') || !_.isObject(c.globalContract)) {
+                throw new gutil.PluginError('gulp-csv-to-json', 'Invalid configuration. Must declare global contract');
+            }
+
+            var a = [];
+
+            _.each(c.list, function (cl) {
+
+                if (!_.has(cl, 'useGlobalContract') || !_.isBoolean(cl.useGlobalContract)) {
+                    throw new gutil.PluginError('gulp-csv-to-json', 'Invalid configuration. Must declare useGlobalContract as boolean');
+                }
+
+                if (cl.useGlobalContract) {
+
+                    cl.contract = c.globalContract;
+
+                }
+
+                a.push(cl);
+            });
+
+            self.processPromises(a, options);
+
+        } else {
+
+            self.processPromises(c, options);
         }
+
+
+    },
+
+    processPromises : function (contract, options) {
+
+        var self = this;
 
         var promises = [];
 
-        _.each(c, function (i) {
+        _.each(contract, function (i) {
 
             if (_.isEmpty(i.contract)) {
 
@@ -50,13 +86,13 @@ var C2JProcessor = {
 
         $q.all(promises)
 
-            .then(function (i) {
-                _.each(i, function (c) {
+        .then(function (i) {
+            _.each(i, function (p) {
 
-                    self.saveToFile(c, _.extend(c.file,options));
+                self.saveToFile(p, _.extend(p.file,options));
 
-                });
             });
+        });
     },
 
     saveToFile : function (c, options) {
@@ -75,7 +111,8 @@ var C2JProcessor = {
 
             if (!_.isNull(err)) {
 
-                console.error("ERROR: Error during save. " + err);
+                throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error during save. ' + err);
+
             }
         })
     },
@@ -109,72 +146,78 @@ var C2JProcessor = {
 
             var c = _.cloneDeep(obj);
 
-            _.each(dots, function (value, key) {
+            try {
 
-                var t = value.split(':');
+                _.each(dots, function (value, key) {
 
-                switch (t[0]) {
-                    case "Array" :
+                    var t = value.split(':');
 
-                        var m = t[1].match(/{([^}]+)}/);
+                    switch (t[0]) {
+                        case "Array" :
 
-                        if (_.isArray(m)) {
-                            var k = null;
-                            if (m[1] === 'int') {
+                            var m = t[1].match(/{([^}]+)}/);
 
-                                k = t[1].replace('{int}', '');
+                            if (_.isArray(m)) {
+                                var k = null;
+                                if (m[1] === 'int') {
 
-                                var num = csv[k].splitPlus('|').map(function(item) {
-                                    return parseInt(item, 10);
-                                });
+                                    k = t[1].replace('{int}', '');
 
-                                _.set(c, key, num);
+                                    var num = csv[k].splitPlus('|').map(function(item) {
+                                        return parseInt(item, 10);
+                                    });
 
-                            } else if (m[1] === 'float') {
-                                k = t[1].replace('{float}', '');
+                                    _.set(c, key, num);
 
-                                var f = csv[k].splitPlus('|').map(function(item) {
-                                    return parseFloat(item);
-                                });
+                                } else if (m[1] === 'float') {
+                                    k = t[1].replace('{float}', '');
 
-                                _.set(c, key, f);
+                                    var f = csv[k].splitPlus('|').map(function(item) {
+                                        return parseFloat(item);
+                                    });
 
+                                    _.set(c, key, f);
+
+                                }
+
+                            } else {
+
+                                _.set(c, key, csv[t[1]].splitPlus('|'));
                             }
 
-                        } else {
+                            break;
 
-                            _.set(c, key, csv[t[1]].splitPlus('|'));
-                        }
+                        case "Float" :
+                            var ft = parseFloat(csv[t[1]]);
 
-                        break;
+                            _.set(c, key, isNaN(ft) ? 0 : n);
 
-                    case "Float" :
-                        var ft = parseFloat(csv[t[1]]);
+                            break;
 
-                        _.set(c, key, isNaN(ft) ? 0 : n);
+                        case "Int" :
 
-                        break;
+                            var n = parseInt(csv[t[1]]);
 
-                    case "Int" :
+                            _.set(c, key, isNaN(n) ? 0 : n);
 
-                        var n = parseInt(csv[t[1]]);
+                            break;
 
-                        _.set(c, key, isNaN(n) ? 0 : n);
+                        case "String" :
+                        default :
 
-                        break;
+                            _.set(c, key, csv[value]);
 
-                    case "String" :
-                    default :
-
-                        _.set(c, key, csv[value]);
-
-                        break;
-                }
+                            break;
+                    }
 
 
-            });
+                });
 
-            temp.push(c);
+                temp.push(c);
+
+            } catch (e) {
+                throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error during parse. ' + err);
+            }
         };
 
         var p = this._parse(item.filePath);

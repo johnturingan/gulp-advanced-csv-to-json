@@ -8,7 +8,7 @@ var aCsvToJson = require('../index.js');
 
 var p = require('./package.json').options;
 
-gulp.task('test', function () {
+gulp.task('convert', function () {
 
     var c = false;
 
