@@ -22,3 +22,20 @@ gulp.task('convert', function () {
         .on('error',g.util.log)
         ;
 });
+
+// Same as convert task except treats empty strings in CSV as nulls
+gulp.task('convert2', function () {
+
+    var c = false;
+
+    if (g.util.env.optimize)
+        c = true;
+
+    return gulp.src(p.configs.src)
+        .pipe(aCsvToJson({
+            tabSize : 4,
+            emptyStringAsNull : true
+        }))
+        .on('error',g.util.log)
+        ;
+});

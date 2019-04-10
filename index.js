@@ -79,7 +79,7 @@ var C2JProcessor = {
 
             } else {
 
-                promises.push(self.parseCsv(i, i.contract));
+                promises.push(self.parseCsv(i, i.contract, options));
 
             }
         });
@@ -89,7 +89,7 @@ var C2JProcessor = {
         .then(function (i) {
             _.each(i, function (p) {
 
-                self.saveToFile(p, _.extend(p.file,options));
+                self.saveToFile(p, _.extend(p.file, options));
 
             });
         });
@@ -134,7 +134,7 @@ var C2JProcessor = {
 
     },
 
-    parseCsv : function (item, contract) {
+    parseCsv : function (item, contract, options) {
 
         var defer = $q.defer();
 
@@ -202,8 +202,24 @@ var C2JProcessor = {
 
                             break;
 
+                        case "Json" :
+                            try {
+                                var json = JSON.parse(csv[t[1]]);
+                            } catch(e) {
+                                throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error parsing JSON in CSV - ' + csv[t[1]]);
+                            }
+
+                            _.set(c, key, json);
+
+                            break;
+
                         case "String" :
                         default :
+                            if (options.emptyStringAsNull) {
+                                if (csv[value] === "") {
+                                    break;
+                                }
+                            }
 
                             _.set(c, key, csv[value]);
 
@@ -267,7 +283,8 @@ var C2JProcessor = {
 module.exports = function(options) {
 
     var opt = {
-        tabSize : 2
+        tabSize : 2,
+        emptyStringAsNull : false
     };
 
     opt = _.extend(opt, options);

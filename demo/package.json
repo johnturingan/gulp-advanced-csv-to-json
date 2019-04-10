@@ -1,6 +1,6 @@
 {
   "name": "gulp-csv-to-json-demo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "[DEMO] Convert CSV to Json based on contract",
   "main": "index.js",
   "scripts": {},
