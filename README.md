@@ -1,7 +1,7 @@
 # [gulp](http://gulpjs.com)-advanced-csv-to-json
 
-> Converts CSV to Json object in various output. You can either do basic conversion or you can use its awesome feature to use your own json structure.
-> This is very helpful if you have complex json structure that a basic csv to json converter cannot do.
+> Converts CSV to JSON object in various output. You can either do basic conversion or you can use its awesome feature to use your own JSON structure.
+> This is very helpful if you have complex JSON structure that a basic CSV to JSON converter cannot do.
 
 Install :traffic_light:
 -------
@@ -12,9 +12,9 @@ $ npm install gulp-advanced-csv-to-json --save
 
 ## Pipe :neckbeard:
 
-Like any other gulp plugin, get source file then process all. Output file can be configured in the source file.
+Like any other gulp plugin, get source file, then process all. Output file can be configured in the source file.
 
-In your gulpfile.js
+In your gulpfile.js:
 
 **`/gulpfile.js`**
 
@@ -61,7 +61,7 @@ gulp.task('bulkCsvToJsonConversion', function(){
 ]
 ```
 
-Sometimes you may want to use same contract to all the csv file that you want to convert. **YOU CAN!** You just need to modify your config file a little bit. Here's how your config file would look like.
+Sometimes you may want to use same contract to all the csv files that you want to convert. **YOU CAN!** You just need to modify your config file a little bit. Here's how your config file would look like:
 
 ```json
 {
@@ -93,7 +93,7 @@ Sometimes you may want to use same contract to all the csv file that you want to
 }
 ```
 
-Notice that there is **useGlobalContract** property that you set to boolean. If you set to `false`, and you don't have a **contract** property, it will convert the csv to flat json. But, if you set it to `false` and you declare **contract**, it will use it instead of the **globalContract**. If you set it to `true`, then ofcourse it will use the global contract you set above.
+Notice that there is **useGlobalContract** boolean property. If you set it to `false`, and you don't have a **contract** property, it will convert the CSV to flat JSON. But if you set it to `false` and you declare **contract**, it will use it instead of the **globalContract**. If you set it to `true`, then of course it will use the global contract you set above.
 
 ### CSV FILE :page_facing_up:
 
@@ -107,43 +107,50 @@ John Doe, Puerto Princesa city, Metro Manila, Palawan, Oxford,1993, Harvard,2003
 
 ## How it Works :wrench:
 
-Advanced Csv to Json will fetch the config file and process all items. It will read the CSV file that you declared and
-check if there's a desired contract that you want to use. If there's none, it will just convert the csv to a flat JSON
-object. If there is, it will use the structure and match all values of the JSON to the CSV.
+Advanced Csv to Json will fetch the config file and process all items. It will read the CSV file that you declared and check if there's a desired contract that you want to use. If there's none, it will just convert the CSV to a flat JSON object. If there is, it will use the structure and match all values of the JSON to the CSV.
 
-Notice that you can declare the value to be an Array or Float (default is String).
+Notice that you can declare the value to be an Array, Float, Int, Json, or String (default is String).
 
 ```text
 {
     key : [dataType]:[csvValue]
 }
-
 ```
 
-If you look at the json and csv closer
+If you look at the JSON and CSV closely:
 
 **`json`**
+
 ```json
 "tags" : "Array:tags"
 ```
+
 **`csv`**
 
 ```text
 a|b|c
 ```
 
-you may notice that the convention for Array:tags is pipe delimited values. You may also set the datatype of the values
-of the array. Lets say you want the array of int or array of float (default is string), you can do that by declaring your
-desired type like this:
+You may notice that the convention for Array:tags is pipe delimited values. You may also set the datatype of the values of the array. Let's say you want the array of int or array of float default is string), you can do that by declaring your desired type like this:
 
 **`int`**
+
 ```text
 "tags" : "Array:{int}tags"
 ```
 
 **`float`**
+
 ```text
 "tags" : "Array:{float}tags"
+```
+
+You can also include JSON itself in your CSV files, which can be useful for representing more complicated JSON structures such as arrays of objects. Power Query in Microsoft Excel, for example, can create arbitrarily complex JSON which you can then export in CSV files. See the t0003.conf template and 003.csv in the demos folder for an example of how to use this.
+
+**`json`**
+
+```text
+"degreeInfo" : "Json:degree_info"
 ```
 
 ## Options :radio_button:
@@ -153,20 +160,22 @@ desired type like this:
 There are 3 options you may use for the config file.
 
 - **`BASIC CONFIG`**
-    - filePath [`String`] - Required :red_circle:
-    - outputPath [`String`] - Optional ```(default: output/{your-csv-filename}.json)```
-    - contract [`Object`] - Optional ```(default: flat json conversion)```
+  - filePath [`String`] - Required :red_circle:
+  - outputPath [`String`] - Optional ```(default: output/{your-csv-filename}.json)```
+  - contract [`Object`] - Optional ```(default: flat json conversion)```
 - **`CONFIG USING GLOBAL CONTRACT`**
-    - globalContract [`Object`] - Required :red_circle:
-    - useGlobalContract [`Boolean`] -  Required :red_circle:
+  - globalContract [`Object`] - Required :red_circle:
+  - useGlobalContract [`Boolean`] -  Required :red_circle:
 
 ### aCsvToJson
 
-Currently there's only one option you can use for this module.
+There are two options you can use with this module.
 
-- tabSize - Your preferred tab size for the JSON.
+- tabSize - Your preferred tab size for the JSON you generate.
+- emptyStringAsNull - (Boolean) If true, JSON will not be generated if the value in the CSV column is blank (empty string, ""). This can be helpful when the CSV file you are generating from contains a lot of null/empty values, because the resulting JSON will be significantly smaller.
 
 ## Running the DEMO :neckbeard:
+
 You may want to test the demo. Here's how to run it.
 
 ```bash

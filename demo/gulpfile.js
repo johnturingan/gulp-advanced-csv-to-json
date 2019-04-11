@@ -1,12 +1,17 @@
 /**
  * Created by isda on 22/04/2016.
+ * Modified by billbliss on 10 April 2019
  */
 
 var gulp = require('gulp');
 var g = require('gulp-load-plugins')();
 var aCsvToJson = require('../index.js');
 
-var p = require('./package.json').options;
+var options = {
+    configs: {
+      src: "templates/**/*.conf"
+    }
+}
 
 gulp.task('convert', function () {
 
@@ -15,12 +20,11 @@ gulp.task('convert', function () {
     if (g.util.env.optimize)
         c = true;
 
-    return gulp.src(p.configs.src)
+    return gulp.src(options.configs.src)
         .pipe(aCsvToJson({
             tabSize : 4
         }))
-        .on('error',g.util.log)
-        ;
+        .on('error', g.util.log);
 });
 
 // Same as convert task except treats empty strings in CSV as nulls
@@ -31,11 +35,10 @@ gulp.task('convert2', function () {
     if (g.util.env.optimize)
         c = true;
 
-    return gulp.src(p.configs.src)
+    return gulp.src(options.configs.src)
         .pipe(aCsvToJson({
             tabSize : 4,
             emptyStringAsNull : true
         }))
-        .on('error',g.util.log)
-        ;
+        .on('error', g.util.log);
 });

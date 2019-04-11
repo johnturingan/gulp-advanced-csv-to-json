@@ -3,14 +3,13 @@
  */
 
 'use strict';
-var path = require('path');
 var fs = require('graceful-fs');
 var gutil = require('gulp-util');
 var es = require('event-stream');
 var csv = require('csv');
 var $q = require('q');
 var _ = require('lodash');
-var dotize = require('dotize');
+var dot = require('dot-object');
 var jsonfile = require('jsonfile');
 
 var C2JProcessor = {
@@ -142,7 +141,7 @@ var C2JProcessor = {
 
         var _flatten  = function(csv, obj) {
 
-            var dots = dotize.convert(obj);
+            var dots = dot.dot(obj);
 
             var c = _.cloneDeep(obj);
 
@@ -190,7 +189,7 @@ var C2JProcessor = {
                         case "Float" :
                             var ft = parseFloat(csv[t[1]]);
 
-                            _.set(c, key, isNaN(ft) ? 0 : n);
+                            _.set(c, key, isNaN(ft) ? 0 : ft);
 
                             break;
 
@@ -203,25 +202,40 @@ var C2JProcessor = {
                             break;
 
                         case "Json" :
-                            try {
-                                var json = JSON.parse(csv[t[1]]);
-                            } catch(e) {
-                                throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error parsing JSON in CSV - ' + csv[t[1]]);
+                            var json = "";
+                            if (csv[t[1]] !== "") {
+
+                                try {
+                                    // Try to parse it as JSON 
+                                    json = JSON.parse(csv[t[1]]);
+                                } catch(e) {
+                                    throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error parsing JSON in CSV - ' + csv[t[1]]);
+                                }
                             }
 
-                            _.set(c, key, json);
+                            if ((json === "") && options.emptyStringAsNull) {
+
+                                dot.remove(key, c);
+
+                            } else {
+
+                                _.set(c, key, json);
+
+                            }
 
                             break;
 
                         case "String" :
                         default :
-                            if (options.emptyStringAsNull) {
-                                if (csv[value] === "") {
-                                    break;
-                                }
-                            }
+                            if ((csv[value] === "") && options.emptyStringAsNull) {
 
-                            _.set(c, key, csv[value]);
+                                dot.remove(key, c);
+
+                            } else {
+
+                                _.set(c, key, csv[value]);
+
+                            }
 
                             break;
                     }

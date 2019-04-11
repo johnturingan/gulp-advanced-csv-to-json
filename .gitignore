@@ -3,3 +3,4 @@ node_modules
 demo/output
 .DS_Store
 demo/.DS_Store
+.vscode
