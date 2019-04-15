@@ -1,6 +1,6 @@
 {
   "name": "gulp-advanced-csv-to-json",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Convert CSV to Json based on your desired json structure",
   "main": "index.js",
   "keywords": [
@@ -14,19 +14,19 @@
     "advance"
   ],
   "dependencies": {
-    "csv": "^0.4.6",
-    "dotize": "^0.1.26",
-    "event-stream": "^3.3.2",
-    "filesize": "~2.0.0",
-    "graceful-fs": "~2.0.0",
-    "gulp-rename": "~1.1.0",
-    "gulp-util": "~2.2.0",
-    "jsonfile": "^2.3.0",
-    "lodash": "^4.11.1",
-    "map-stream": "0.0.4",
-    "q": "^1.4.1",
-    "temp-write": "~0.1.0",
-    "xml2js": "~0.4.1"
+    "csv": "5.1.1",
+    "dot-object": "^1.7.1",
+    "event-stream": "^4.0.1",
+    "filesize": "~4.1.2",
+    "graceful-fs": "^4.1.15",
+    "gulp-rename": "~1.4.0",
+    "gulp-util": "~3.0.8",
+    "jsonfile": "^5.0.0",
+    "lodash": "^4.11.11",
+    "map-stream": "0.0.7",
+    "q": "^1.1.1",
+    "temp-write": "^3.4.0",
+    "xml2js": "~0.4.19"
   },
   "author": "johnturingan",
   "license": "MIT",

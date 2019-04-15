@@ -3,14 +3,13 @@
  */
 
 'use strict';
-var path = require('path');
 var fs = require('graceful-fs');
 var gutil = require('gulp-util');
 var es = require('event-stream');
 var csv = require('csv');
 var $q = require('q');
 var _ = require('lodash');
-var dotize = require('dotize');
+var dot = require('dot-object');
 var jsonfile = require('jsonfile');
 
 var C2JProcessor = {
@@ -79,7 +78,7 @@ var C2JProcessor = {
 
             } else {
 
-                promises.push(self.parseCsv(i, i.contract));
+                promises.push(self.parseCsv(i, i.contract, options));
 
             }
         });
@@ -89,7 +88,7 @@ var C2JProcessor = {
         .then(function (i) {
             _.each(i, function (p) {
 
-                self.saveToFile(p, _.extend(p.file,options));
+                self.saveToFile(p, _.extend(p.file, options));
 
             });
         });
@@ -134,7 +133,7 @@ var C2JProcessor = {
 
     },
 
-    parseCsv : function (item, contract) {
+    parseCsv : function (item, contract, options) {
 
         var defer = $q.defer();
 
@@ -142,7 +141,7 @@ var C2JProcessor = {
 
         var _flatten  = function(csv, obj) {
 
-            var dots = dotize.convert(obj);
+            var dots = dot.dot(obj);
 
             var c = _.cloneDeep(obj);
 
@@ -190,7 +189,7 @@ var C2JProcessor = {
                         case "Float" :
                             var ft = parseFloat(csv[t[1]]);
 
-                            _.set(c, key, isNaN(ft) ? 0 : n);
+                            _.set(c, key, isNaN(ft) ? 0 : ft);
 
                             break;
 
@@ -202,10 +201,41 @@ var C2JProcessor = {
 
                             break;
 
+                        case "Json" :
+                            var json = "";
+                            if (csv[t[1]] !== "") {
+
+                                try {
+                                    // Try to parse it as JSON 
+                                    json = JSON.parse(csv[t[1]]);
+                                } catch(e) {
+                                    throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error parsing JSON in CSV - ' + csv[t[1]]);
+                                }
+                            }
+
+                            if ((json === "") && options.emptyStringAsNull) {
+
+                                dot.remove(key, c);
+
+                            } else {
+
+                                _.set(c, key, json);
+
+                            }
+
+                            break;
+
                         case "String" :
                         default :
+                            if ((csv[value] === "") && options.emptyStringAsNull) {
 
-                            _.set(c, key, csv[value]);
+                                dot.remove(key, c);
+
+                            } else {
+
+                                _.set(c, key, csv[value]);
+
+                            }
 
                             break;
                     }
@@ -267,7 +297,8 @@ var C2JProcessor = {
 module.exports = function(options) {
 
     var opt = {
-        tabSize : 2
+        tabSize : 2,
+        emptyStringAsNull : false
     };
 
     opt = _.extend(opt, options);
