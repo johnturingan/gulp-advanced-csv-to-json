@@ -31,7 +31,7 @@
   "author": "johnturingan",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "~1.17.1"
+    "mocha": "^6.1.3"
   },
   "homepage": "https://github.com/johnturingan/gulp-advanced-csv-to-json/",
   "bugs": "https://github.com/johnturingan/gulp-advanced-csv-to-json/issues/",
