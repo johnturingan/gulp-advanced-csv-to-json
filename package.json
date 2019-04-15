@@ -1,6 +1,6 @@
 {
   "name": "gulp-advanced-csv-to-json",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Convert CSV to Json based on your desired json structure",
   "main": "index.js",
   "keywords": [

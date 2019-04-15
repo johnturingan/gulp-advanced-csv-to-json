@@ -16,10 +16,10 @@
   "author": "johnturingan",
   "license": "MIT",
   "devDependencies": {},
-  "homepage": "https://github.com/johnturingan/gulp-csv-to-json/",
-  "bugs": "https://github.com/johnturingan/gulp-csv-to-json/issues/",
+  "homepage": "https://github.com/johnturingan/gulp-advanced-csv-to-json/",
+  "bugs": "https://github.com/johnturingan/gulp-advanced-csv-to-json/issues/",
   "repository": {
     "type": "git",
-    "url": "git@github.com:johnturingan/gulp-csv-to-json.git"
+    "url": "git@github.com:johnturingan/gulp-advanced-csv-to-json.git"
   }
 }
