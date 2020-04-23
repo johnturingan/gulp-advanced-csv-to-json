@@ -3,42 +3,45 @@
  * Modified by billbliss on 10 April 2019
  */
 
-var gulp = require('gulp');
-var g = require('gulp-load-plugins')();
-var aCsvToJson = require('../index.js');
+const gulp = require('gulp');
+const log = require('fancy-log');
+const aCsvToJson = require('../index.js');
+// const argv = require('minimist')(process.argv.slice(2));
 
-var options = {
+let options = {
     configs: {
       src: "templates/**/*.conf"
     }
-}
+};
 
 gulp.task('convert', function () {
-
-    var c = false;
-
-    if (g.util.env.optimize)
-        c = true;
 
     return gulp.src(options.configs.src)
         .pipe(aCsvToJson({
             tabSize : 4
         }))
-        .on('error', g.util.log);
+        .on('error', log);
 });
 
 // Same as convert task except treats empty strings in CSV as nulls
 gulp.task('convert2', function () {
-
-    var c = false;
-
-    if (g.util.env.optimize)
-        c = true;
 
     return gulp.src(options.configs.src)
         .pipe(aCsvToJson({
             tabSize : 4,
             emptyStringAsNull : true
         }))
-        .on('error', g.util.log);
+        .on('error', log);
+});
+
+// Lets you group each item by property value
+gulp.task('convert3', function () {
+
+    return gulp.src(options.configs.src)
+        .pipe(aCsvToJson({
+            tabSize : 4,
+            emptyStringAsNull : true,
+            groupBy: "gender"
+        }))
+        .on('error', log);
 });

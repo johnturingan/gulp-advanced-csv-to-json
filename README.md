@@ -43,8 +43,10 @@ gulp.task('bulkCsvToJsonConversion', function(){
     {
         "filePath" : "csv/001.csv",
         "outputPath" : "output/001.json",
+        "groupBy": "gender",
         "contract" : {
             "name" : "name",
+            "gender": "gender",
             "profile" : {
                 "age" : "Float:profile/age"
             },
@@ -66,34 +68,97 @@ Sometimes you may want to use same contract to all the csv files that you want t
 ```json
 {
     "globalContract" : {
-        "name" : "name",
-        "profile" : {
-            "age" : "Float:profile/age"
-        },
-        "address" : {
-            "permanent" : {
-                "city" : "address/permanent/city",
-                "state" : "address/permanent/state"
-            },
-            "current" : "address/current"
-        },
-        "tags" : "Array:tags"
+       "name" : "name",
+       "gender": "gender",
+       "profile" : {
+           "age" : "Float:profile/age"
+       },
+       "address" : {
+           "permanent" : {
+               "city" : "address/permanent/city",
+               "state" : "address/permanent/state"
+           },
+           "current" : "address/current"
+       },
+       "tags" : "Array:tags"
     },
     "list" : [
         {
-            "filePath" : "csv/002.csv",
-            "useGlobalContract" : false
+            "filePath" : "csv/001.csv",
+            "outputPath" : "output/T002-privateGlobalContract.json",
+            "contract" : {
+                 "name" : "name",
+                 "profile" : {
+                     "age" : "Float:profile/age"
+                 },
+                 "address" : {
+                     "permanent" : {
+                         "city" : "address/permanent/city",
+                         "state" : "address/permanent/state"
+                     },
+                     "current" : "address/current"
+                 },
+                 "tags" : "Array:tags"
+            }
         },
         {
             "filePath" : "csv/001.csv",
-            "outputPath" : "output/001.json",
-            "useGlobalContract" : true
+            "outputPath" : "output/T002-noGlobalContract.json",
+            "contract" : false
+        },
+        {
+            "filePath" : "csv/002.csv",
+            "outputPath" : "output/T002-GlobalContract.json",
+            "contract" : true
+        },
+        {
+            "filePath" : "csv/003.csv",
+            "outputPath" : "output/T003-noGlobalContract.json",
+            "groupBy": "school_0",
+            "contract" : false
+        },
+        {
+            "filePath" : "csv/003.csv",
+            "outputPath" : "output/T003-GlobalContract.json",
+            "contract" : true
         }
     ]
 }
 ```
 
-Notice that there is **useGlobalContract** boolean property. If you set it to `false`, and you don't have a **contract** property, it will convert the CSV to flat JSON. But if you set it to `false` and you declare **contract**, it will use it instead of the **globalContract**. If you set it to `true`, then of course it will use the global contract you set above.
+The **contract** property lets you decide, whether or not to use the global contract, private contract or just no contract at all. Possible values are: 
+
+To use Global Contract:
+
+```
+"contract": true
+```
+
+To use Private Contract: 
+
+```
+"contract" : {
+     "name" : "name",
+     "profile" : {
+         "age" : "Float:profile/age"
+     },
+     "address" : {
+         "permanent" : {
+             "city" : "address/permanent/city",
+             "state" : "address/permanent/state"
+         },
+         "current" : "address/current"
+     },
+     "tags" : "Array:tags"
+}
+```
+
+Don't want to use any:
+
+```
+"contract": false
+```
+or just omit the contract property
 
 ### CSV FILE :page_facing_up:
 
@@ -157,22 +222,25 @@ You can also include JSON itself in your CSV files, which can be useful for repr
 
 ### CONFIG FILE
 
-There are 3 options you may use for the config file.
+There are options you may use for the config file.
 
 - **`BASIC CONFIG`**
   - filePath [`String`] - Required :red_circle:
   - outputPath [`String`] - Optional ```(default: output/{your-csv-filename}.json)```
+  - groupBy: [`String`] - Optional 
   - contract [`Object`] - Optional ```(default: flat json conversion)```
 - **`CONFIG USING GLOBAL CONTRACT`**
   - globalContract [`Object`] - Required :red_circle:
-  - useGlobalContract [`Boolean`] -  Required :red_circle:
+  - groupBy: [`String`] - Optional 
+  - contract -  Optional
 
 ### aCsvToJson
 
-There are two options you can use with this module.
+There are 3 options you can use with this module.
 
-- tabSize - Your preferred tab size for the JSON you generate.
-- emptyStringAsNull - (Boolean) If true, JSON will not be generated if the value in the CSV column is blank (empty string, ""). This can be helpful when the CSV file you are generating from contains a lot of null/empty values, because the resulting JSON will be significantly smaller.
+- ***tabSize*** - Your preferred tab size for the JSON you generate.
+- ***emptyStringAsNull*** - (Boolean) If true, JSON will not be generated if the value in the CSV column is blank (empty string, ""). This can be helpful when the CSV file you are generating from contains a lot of null/empty values, because the resulting JSON will be significantly smaller.
+- ***groupBy*** (optional) - Lets you group the items based on value of the property you set. This settings is global, if you want to more specific, use **groupBy** in the config file not here.
 
 ## Running the DEMO :neckbeard:
 
@@ -190,4 +258,4 @@ If you find any bugs or you have some ideas in mind that would make this better.
 
 ----
 **[MIT](LICENSE) LICENSE** <br>
-copyright &copy; 2016 Scripts and Pixels.
+copyright &copy; 2020 Scripts and Pixels.

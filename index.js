@@ -3,51 +3,54 @@
  */
 
 'use strict';
-var fs = require('graceful-fs');
-var gutil = require('gulp-util');
-var es = require('event-stream');
-var csv = require('csv');
-var $q = require('q');
-var _ = require('lodash');
-var dot = require('dot-object');
-var jsonfile = require('jsonfile');
+const fs = require('graceful-fs');
+const es = require('event-stream');
+const csv = require('csv');
+const $q = require('q');
+const _ = require('lodash');
+const jsonFile = require('jsonfile');
+const PluginError = require('plugin-error');
+const dot = require('dot-object');
 
-var C2JProcessor = {
+let C2JProcessor = {
 
     initExtensions : function () {
 
         String.prototype.splitPlus = function(sep) {
-            var a = this.split(sep);
-            if (a[0] == '') return [];
+            let a = this.split(sep);
+            if (a[0] === '') return [];
             return a;
         };
     },
 
     init : function (fileContents, options) {
 
-        var self = this;
+        let self = this;
 
         this.initExtensions();
 
-        var c = JSON.parse(fileContents);
+        let c = JSON.parse(fileContents);
 
         if (!_.isArray(c)) {
 
-            if (!_.has(c, 'globalContract') || !_.isObject(c.globalContract)) {
-                throw new gutil.PluginError('gulp-csv-to-json', 'Invalid configuration. Must declare global contract');
-            }
+            const gc = c['globalContract'];
 
-            var a = [];
+            if (!_.isObject(gc)) {
+                throw new PluginError('gulp-csv-to-json', 'Invalid configuration. Must declare global contract');
+            }
+            let a = [];
 
             _.each(c.list, function (cl) {
 
-                if (!_.has(cl, 'useGlobalContract') || !_.isBoolean(cl.useGlobalContract)) {
-                    throw new gutil.PluginError('gulp-csv-to-json', 'Invalid configuration. Must declare useGlobalContract as boolean');
-                }
+                const _c = cl['contract'];
 
-                if (cl.useGlobalContract) {
+                if (_c === 'global' || _c === true) {
 
-                    cl.contract = c.globalContract;
+                    cl.contract = gc;
+
+                } else if (_.isObject(_c)) {
+
+                    cl.contract = _c;
 
                 }
 
@@ -66,15 +69,15 @@ var C2JProcessor = {
 
     processPromises : function (contract, options) {
 
-        var self = this;
+        let self = this;
 
-        var promises = [];
+        let promises = [];
 
         _.each(contract, function (i) {
 
             if (_.isEmpty(i.contract)) {
 
-                promises.push(self.flatJson(i));
+                promises.push(self.flatJson(i, options));
 
             } else {
 
@@ -96,33 +99,36 @@ var C2JProcessor = {
 
     saveToFile : function (c, options) {
 
-        var outName = options.filePath.replace(/^.*[\\\/]/, '').replace('.csv', '');
+        let outName = options.filePath.replace(/^.*[\\\/]/, '').replace('.csv', '');
 
-        var file = options.outputPath || 'output/' + outName + '.json';
+        let file = options.outputPath || 'output/' + outName + '.json';
 
-        var dirname = file.match(/(.*)[\/\\]/)[1]||'';
+        let dirname = file.match(/(.*)[\/\\]/)[1]||'';
 
         if (!fs.existsSync(dirname)){
             fs.mkdirSync(dirname);
         }
 
-        jsonfile.writeFile(file, c.data, { spaces: options.tabSize }, function (err) {
+        jsonFile.writeFile(file, c.data, { spaces: options.tabSize }, function (err) {
 
             if (!_.isNull(err)) {
 
-                throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error during save. ' + err);
+                throw new PluginError('gulp-csv-to-json', 'ERROR: Error during save. ' + err);
 
             }
         })
     },
 
-    flatJson : function (item) {
+    flatJson : function (item, options) {
 
-        var defer = $q.defer();
+        let defer = $q.defer();
 
-        var p = this._parse(item.filePath);
+        let p = this._parse(item.filePath);
 
-        p.then (function (d) {
+        p.then ((d) => {
+
+            d = this._groupBy(d, item, options);
+
             defer.resolve({
                 file : item,
                 data : d
@@ -135,34 +141,34 @@ var C2JProcessor = {
 
     parseCsv : function (item, contract, options) {
 
-        var defer = $q.defer();
+        let defer = $q.defer();
 
-        var temp = [];
+        let temp = [];
 
-        var _flatten  = function(csv, obj) {
+        let _flatten  = function(csv, obj) {
 
-            var dots = dot.dot(obj);
+            let dots = dot.dot(obj);
 
-            var c = _.cloneDeep(obj);
+            let c = _.cloneDeep(obj);
 
             try {
 
                 _.each(dots, function (value, key) {
 
-                    var t = value.split(':');
+                    let t = value.split(':');
 
                     switch (t[0]) {
                         case "Array" :
 
-                            var m = t[1].match(/{([^}]+)}/);
+                            let m = t[1].match(/{([^}]+)}/);
 
                             if (_.isArray(m)) {
-                                var k = null;
+                                let k = null;
                                 if (m[1] === 'int') {
 
                                     k = t[1].replace('{int}', '');
 
-                                    var num = csv[k].splitPlus('|').map(function(item) {
+                                    let num = csv[k].splitPlus('|').map(function(item) {
                                         return parseInt(item, 10);
                                     });
 
@@ -171,7 +177,7 @@ var C2JProcessor = {
                                 } else if (m[1] === 'float') {
                                     k = t[1].replace('{float}', '');
 
-                                    var f = csv[k].splitPlus('|').map(function(item) {
+                                    let f = csv[k].splitPlus('|').map(function(item) {
                                         return parseFloat(item);
                                     });
 
@@ -187,7 +193,7 @@ var C2JProcessor = {
                             break;
 
                         case "Float" :
-                            var ft = parseFloat(csv[t[1]]);
+                            let ft = parseFloat(csv[t[1]]);
 
                             _.set(c, key, isNaN(ft) ? 0 : ft);
 
@@ -195,21 +201,21 @@ var C2JProcessor = {
 
                         case "Int" :
 
-                            var n = parseInt(csv[t[1]]);
+                            let n = parseInt(csv[t[1]]);
 
                             _.set(c, key, isNaN(n) ? 0 : n);
 
                             break;
 
                         case "Json" :
-                            var json = "";
+                            let json = "";
                             if (csv[t[1]] !== "") {
 
                                 try {
                                     // Try to parse it as JSON 
                                     json = JSON.parse(csv[t[1]]);
                                 } catch(e) {
-                                    throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error parsing JSON in CSV - ' + csv[t[1]]);
+                                    throw new PluginError('gulp-csv-to-json', 'ERROR: Error parsing JSON in CSV - ' + csv[t[1]]);
                                 }
                             }
 
@@ -246,17 +252,19 @@ var C2JProcessor = {
                 temp.push(c);
 
             } catch (e) {
-                throw new gutil.PluginError('gulp-csv-to-json', 'ERROR: Error during parse. ' + err);
+                throw new PluginError('gulp-csv-to-json', 'ERROR: Error during parse. ' + err);
             }
         };
 
-        var p = this._parse(item.filePath);
+        let p = this._parse(item.filePath);
 
-        p.then(function (d) {
+        p.then( (d) => {
 
             _.each(d, function (csv) {
                 _flatten(csv, contract);
             });
+
+            temp = this._groupBy(temp, item, options);
 
             defer.resolve({
                 file : item,
@@ -267,14 +275,34 @@ var C2JProcessor = {
         return defer.promise;
     },
 
+    _groupBy (items, conf, options) {
+
+        const g = conf.groupBy || options.groupBy;
+
+        if (!g) return items;
+
+        let temp = {};
+
+        _.each(items, (i) => {
+
+            let prop = i[g] || "_blank_";
+
+            temp[prop] = temp[prop] || [];
+
+            temp[prop].push(i);
+        });
+
+        return temp;
+    },
+
     _parse : function (file) {
 
-        var defer = $q.defer();
+        let defer = $q.defer();
 
         if (fs.existsSync(file)) {
-            var bufferContents = fs.readFileSync(file);
+            let bufferContents = fs.readFileSync(file);
 
-            var x = csv.parse(bufferContents.toString(), {
+            let x = csv.parse(bufferContents.toString(), {
 
                 columns : true,
                 trim : true
@@ -285,7 +313,7 @@ var C2JProcessor = {
             });
 
         } else {
-            throw new gutil.PluginError('gulp-csv-to-json', 'File not found: ' + file);
+            throw new PluginError('gulp-csv-to-json', 'File not found: ' + file);
         }
 
         return defer.promise;
@@ -296,7 +324,7 @@ var C2JProcessor = {
 
 module.exports = function(options) {
 
-    var opt = {
+    let opt = {
         tabSize : 2,
         emptyStringAsNull : false
     };
@@ -310,7 +338,7 @@ module.exports = function(options) {
         }
 
         if (file.isStream()) {
-            throw new gutil.PluginError('gulp-csv-to-json', 'stream not supported');
+            throw new PluginError('gulp-csv-to-json', 'stream not supported');
         }
 
         if (file.isBuffer()) {
